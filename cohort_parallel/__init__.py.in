@@ -1,0 +1,16 @@
+# -*- python -*-
+
+"""
+A toy problem demonstrating parallelisation over cohorts.
+"""
+
+#
+#__init__.py is automatically generated from __init__.py.in, DO NOT EDIT __init__.py
+#
+
+__version__ = "@VERSION@"
+
+__all__ = ('task',)
+
+from .task import Task
+
