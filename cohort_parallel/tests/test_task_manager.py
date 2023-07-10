@@ -4,6 +4,7 @@ def test_task4_5():
     t = TaskManager(4, 8)
 
     assert(t.get_num_tasks() == 11)
+    
     assert(t.get_num_time_steps(0) == 4)
     assert(t.get_num_time_steps(1) == 3)
     assert(t.get_num_time_steps(2) == 2)
@@ -27,6 +28,18 @@ def test_task4_5():
     assert(t.get_initial_dependencies(8) == {7, 6, 5})
     assert(t.get_initial_dependencies(9) == {8, 7, 6})
     assert(t.get_initial_dependencies(10) == {9, 8, 7})
+
+    assert(t.get_next_task(0) == 7)
+    assert(t.get_next_task(1) == 6)
+    assert(t.get_next_task(2) == 5)
+    assert(t.get_next_task(3) == 4)
+    assert(t.get_next_task(4) == 8)
+    assert(t.get_next_task(5) == 9)
+    assert(t.get_next_task(6) == 10)
+    assert(t.get_next_task(7) == None)
+    assert(t.get_next_task(8) == None)
+    assert(t.get_next_task(9) == None)
+    assert(t.get_next_task(10) == None)
     
 
 if __name__ == '__main__':

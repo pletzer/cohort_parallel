@@ -31,6 +31,15 @@ class TaskManager:
             res = {i for i in range(self.na + 3 - task_id)}.union({i for i in range(self.na, task_id)})
         return res
 
+    def get_next_task(self, task_id):
+        res = task_id + self.na
+        if task_id < self.na:
+            res = task_id + 2*(self.na - 1 - task_id) + 1
+        elif task_id > self.get_num_tasks() - self.na - 1:
+            # last na tasks
+            res = None
+        return res
+
 
 
 
