@@ -29,7 +29,7 @@ class Task:
 			res = {i - 1 for i in range(task_id, self.na - 1)}
 		elif self.na <= task_id < 2*self.na - 1:
 			res = {i for i in range(task_id - self.na + 2)}
-			res += {i for range(self.na, task_id)}
+			res += {i for i in range(self.na, task_id)}
 		return res
 
 
