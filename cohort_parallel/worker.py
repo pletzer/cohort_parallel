@@ -1,3 +1,4 @@
+import time
 
 
 class Worker:
@@ -7,6 +8,8 @@ class Worker:
         Constructor
         :param na: number of age groups
         :param nt: number of time steps
+        :param worker_id: worker ID
+
         """
         self.na = na
         self.nt = nt
@@ -14,35 +17,17 @@ class Worker:
         # initially
         self.task_id = worker_id
 
+        # time to execute one step
+        self.one_step_time = 1
+
+
     def get_num_workers(self):
         return self.na
 
-    def get_num_time_steps(self, task_id):
-        # if task_id < self.na
-        res = self.na - task_id
-        if self.na <= task_id < self.nt:
-            res = self.na
-        elif task_id >= self.nt:
-            res = self.na + self.nt - task_id - 1
-        return res
 
-    def get_initial_dependencies(self, task_id):
-        res = None
-        if task_id > 2*self.na - 1:
-            res = {i for i in range(task_id - self.na + 1, task_id)}
-        elif self.na <= task_id <= 2*self.na - 1:
-            res = {i for i in range(self.na + 3 - task_id)}.union({i for i in range(self.na, task_id)})
-        return res
-
-    def get_next_task(self, task_id):
-        res = task_id + self.na
-        if task_id < self.na:
-            res = task_id + 2*(self.na - 1 - task_id) + 1
-        elif task_id > self.get_num_tasks() - self.na - 1:
-            # last na tasks
-            res = None
-        return res
-
-
+    def execute_task(self):
+        nsteps = self.task.get_num_steps(self.task_id)
+        time.sleep(nsteps * self.one_step_time)
+        self.task_id = self.task.get_next_task(self.task_id)
 
 
