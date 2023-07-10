@@ -1,10 +1,32 @@
 from cohort_parallel import TaskManager
 
-def test_task4_5():
+
+def test_task2_3():
+    t = TaskManager(2, 3)
+
+    assert(t.get_num_tasks() == 4)
+
+    assert(t.get_num_time_steps(0) == 2)
+    assert(t.get_num_time_steps(1) == 1)
+    assert(t.get_num_time_steps(2) == 2)
+    assert(t.get_num_time_steps(3) == 1)
+
+    assert(t.get_initial_dependencies(0) is None)
+    assert(t.get_initial_dependencies(1) is None)
+    assert(t.get_initial_dependencies(2) == {0})
+    assert(t.get_initial_dependencies(3) == {2})
+
+    assert(t.get_next_task(0) == 3)
+    assert(t.get_next_task(1) == 2)
+    assert(t.get_next_task(2) == None)
+    assert(t.get_next_task(3) == None)
+
+
+def test_task4_8():
     t = TaskManager(4, 8)
 
     assert(t.get_num_tasks() == 11)
-    
+
     assert(t.get_num_time_steps(0) == 4)
     assert(t.get_num_time_steps(1) == 3)
     assert(t.get_num_time_steps(2) == 2)
@@ -43,4 +65,5 @@ def test_task4_5():
     
 
 if __name__ == '__main__':
-    test_task4_5()
+    test_task2_3()
+    test_task4_8()

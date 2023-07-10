@@ -13,4 +13,4 @@ __version__ = "@VERSION@"
 __all__ = ('task_manager', 'worker')
 
 from .task_manager import TaskManager
-
+from .worker import Worker

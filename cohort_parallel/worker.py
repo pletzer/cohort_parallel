@@ -1,8 +1,8 @@
 
 
-class TaskManager:
+class Worker:
 
-    def __init__(self, na, nt):
+    def __init__(self, na, nt, worker_id):
         """
         Constructor
         :param na: number of age groups
@@ -10,9 +10,12 @@ class TaskManager:
         """
         self.na = na
         self.nt = nt
+        self.task = TaskManager(na, nt)
+        # initially
+        self.task_id = worker_id
 
-    def get_num_tasks(self):
-        return self.nt + self.na - 1
+    def get_num_workers(self):
+        return self.na
 
     def get_num_time_steps(self, task_id):
         # if task_id < self.na
@@ -28,7 +31,7 @@ class TaskManager:
         if task_id > 2*self.na - 1:
             res = {i for i in range(task_id - self.na + 1, task_id)}
         elif self.na <= task_id <= 2*self.na - 1:
-            res = {i for i in range(2*self.na - 1 - task_id)}.union({i for i in range(self.na, task_id)})
+            res = {i for i in range(self.na + 3 - task_id)}.union({i for i in range(self.na, task_id)})
         return res
 
     def get_next_task(self, task_id):
