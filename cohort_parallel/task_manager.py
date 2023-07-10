@@ -1,6 +1,6 @@
 
 
-class Task:
+class TaskManager:
 
     def __init__(self, na, nt):
         """

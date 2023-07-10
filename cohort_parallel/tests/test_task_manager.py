@@ -1,7 +1,7 @@
-from cohort_parallel import Task
+from cohort_parallel import TaskManager
 
 def test_task4_5():
-    t = Task(4, 8)
+    t = TaskManager(4, 8)
 
     assert(t.get_num_tasks() == 11)
     assert(t.get_num_time_steps(0) == 4)
