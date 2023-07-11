@@ -35,9 +35,22 @@ class TaskManager:
         return res
 
 
+    def get_worker(self, task_id):
+        """
+        Get the worker ID for this task
+        :param task_id: task ID
+        :returns number        
+        """
+        if task_id < self.na:
+            return task_id
+        else:
+            return (self.na - 1 - task_id) % self.na
+
+
+
     def get_initial_dependencies(self, task_id):
         """
-        Get the number of dependencies for the current task to be able to start
+        Get all the task dependencies for the current task
         :param task_id: task ID
         :returns number
         """

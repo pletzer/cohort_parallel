@@ -26,6 +26,11 @@ def test_task2_3():
     assert(t.get_next_task(2) == None)
     assert(t.get_next_task(3) == None)
 
+    assert(t.get_worker(0) == 0)
+    assert(t.get_worker(1) == 1)
+    assert(t.get_worker(2) == 1)
+    assert(t.get_worker(3) == 0)
+
 
 def test_task3_10():
     """
@@ -83,6 +88,20 @@ def test_task3_10():
     assert(t.get_next_task(10) == None)
     assert(t.get_next_task(11) == None)
 
+    assert(t.get_worker(0) == 0)
+    assert(t.get_worker(1) == 1)
+    assert(t.get_worker(2) == 2)
+    assert(t.get_worker(3) == 2)
+    assert(t.get_worker(4) == 1)
+    assert(t.get_worker(5) == 0)
+    assert(t.get_worker(6) == 2)
+    assert(t.get_worker(7) == 1)
+    assert(t.get_worker(8) == 0)
+    assert(t.get_worker(9) == 2)
+    assert(t.get_worker(10) == 1)
+    assert(t.get_worker(11) == 0)
+
+
 
 def test_task4_8():
     """
@@ -134,6 +153,19 @@ def test_task4_8():
     assert(t.get_next_task(8) == None)
     assert(t.get_next_task(9) == None)
     assert(t.get_next_task(10) == None)
+
+    assert(t.get_worker(0) == 0)
+    assert(t.get_worker(1) == 1)
+    assert(t.get_worker(2) == 2)
+    assert(t.get_worker(3) == 3)
+    assert(t.get_worker(4) == 3)
+    assert(t.get_worker(5) == 2)
+    assert(t.get_worker(6) == 1)
+    assert(t.get_worker(7) == 0)
+    assert(t.get_worker(8) == 3)
+    assert(t.get_worker(9) == 2)
+    assert(t.get_worker(10) == 1)
+
     
 
 if __name__ == '__main__':
