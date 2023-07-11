@@ -20,7 +20,7 @@ class Worker:
 
     def get_num_time_steps_to_execute(self):
         """
-        Get the number of time steps to execute in the queued task
+        Get the number of time steps to execute for the queued task
         :returns number
         """
         return self.task.get_num_time_steps(self.task_id)
