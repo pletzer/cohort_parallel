@@ -40,7 +40,7 @@ real	0m8.758s
 user	0m1.495s
 sys	0m0.436s
 ```
-The number before "x" is the task ID and the number after the "x" is the number of time steps. Each time step takes 1 sec. In this particular case, worker 0 executed 
+The number before "x" is the task ID and the number after the "x" is the number of time steps. Each time step takes 1 sec. In this particular case, worker 0 executed (rows are time steps and columns are age groups)
 ```
 0 . . .
 . 0 . .
@@ -62,5 +62,5 @@ while worker 1 executed
 . . . 6
 10. . .
 ```
-
+etc. The total execution cost is NA * NT, in this case 32 sec. The parallel speedup therefore is "32 sec/8.8 sec = 3.6". 
 
