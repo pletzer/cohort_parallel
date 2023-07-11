@@ -36,7 +36,7 @@ class TaskManager:
         if task_id < self.na:
             res = task_id + 2*(self.na - 1 - task_id) + 1
         elif task_id > self.get_num_tasks() - self.na - 1:
-            # last na tasks
+            # last task
             res = None
         return res
 

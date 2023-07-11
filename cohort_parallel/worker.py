@@ -1,4 +1,5 @@
 import time
+from task_manager import TaskManager
 
 
 class Worker:
@@ -21,13 +22,18 @@ class Worker:
         self.one_step_time = 1
 
 
-    def get_num_workers(self):
-        return self.na
+    def get_num_time_steps_to_execute(self):
+        return self.task.get_num_time_steps(self.task_id)
 
 
     def execute_task(self):
-        nsteps = self.task.get_num_steps(self.task_id)
+        nsteps = self.task.get_num_time_steps(self.task_id)
         time.sleep(nsteps * self.one_step_time)
         self.task_id = self.task.get_next_task(self.task_id)
+        return self.task_id
+
+
+    def get_task_to_execute(self):
+        return self.task_id
 
 
