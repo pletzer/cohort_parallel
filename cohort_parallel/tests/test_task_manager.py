@@ -2,6 +2,11 @@ from cohort_parallel import TaskManager
 
 
 def test_task2_3():
+    """
+    0 1
+    2 0
+    3 2
+    """
     t = TaskManager(2, 3)
 
     assert(t.get_num_tasks() == 4)
@@ -23,6 +28,18 @@ def test_task2_3():
 
 
 def test_task3_10():
+    """
+     0  1  2
+     3  0  1
+     4  3  0
+     5  4  3
+     6  5  4
+     7  6  5
+     8  7  6
+     9  8  7
+    10  9  8
+    11 10  9
+    """
     t = TaskManager(3, 10)
 
     assert(t.get_num_tasks() == 12)
@@ -68,6 +85,16 @@ def test_task3_10():
 
 
 def test_task4_8():
+    """
+     0  1  2  3
+     4  0  1  2
+     5  4  0  1
+     6  5  4  0
+     7  6  5  4
+     8  7  6  5
+     9  8  7  6
+    10  9  8  7
+    """
     t = TaskManager(4, 8)
 
     assert(t.get_num_tasks() == 11)
