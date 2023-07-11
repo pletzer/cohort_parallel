@@ -1,10 +1,13 @@
 import time
 from task_manager import TaskManager
+from mpi4py import MPI
+from mpi4py.util import dtlib
+import numpy as np
 
 
 class Worker:
 
-    def __init__(self, na, nt, worker_id):
+    def __init__(self, na, nt, worker_id, comm=MPI.COMM_WORLD):
         """
         Constructor
         :param na: number of age groups
@@ -16,6 +19,8 @@ class Worker:
         self.task = TaskManager(na, nt)
         # initially
         self.task_id = worker_id
+        self.comm = comm
+        self.me = comm.Get_rank()
 
 
     def get_num_time_steps_to_execute(self):
@@ -32,9 +37,17 @@ class Worker:
         :param exec_sec: time it takes to execute one time step in secs
         :returns the next task ID or None if there are no more tasks
         """
+        # get the initial data dependencies
+        other_task_ids = self.task.get_initial_dependencies(self.task_id)
+
+        # get the data
+        # TO DO
+
+
         nsteps = self.task.get_num_time_steps(self.task_id)
         # zzzzzzz....
         time.sleep(nsteps * exec_sec)
+
         self.task_id = self.task.get_next_task(self.task_id)
         return self.task_id
 
