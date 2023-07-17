@@ -3,7 +3,7 @@ from task_manager import TaskManager
 from mpi4py import MPI
 from mpi4py.util import dtlib
 import numpy as np
-
+import logging
 
 class Worker:
 
@@ -54,11 +54,12 @@ class Worker:
         :param exec_sec: time it takes to execute one time step in secs
         """
 
-        print(f'worker {self.me} is executing task {self.task_id}...', end="")
+        logging.debug(f'worker {self.me} is executing task {self.task_id}...')
+
         # zzzzzzz....
         time.sleep(exec_sec)
-        print(f'Done!', end="")
-        #self.comm.Barrier()
+
+        logging.debug(f'worker {self.me} is done!')
 
         # update the data
         self.srcBuffer[:] += 1.0
@@ -68,6 +69,7 @@ class Worker:
         # update the time step
         self.step += 1
 
+        # we're telling that the window operation is the first and will not involve RMA put
         self.window.Fence(MPI.MODE_NOPUT | MPI.MODE_NOPRECEDE)
 
         if self.step >= ns:
@@ -85,10 +87,13 @@ class Worker:
                 for tid in other_task_ids:
                     wid = self.task.get_worker(tid)
 
+                    # asynchrounous remote memory read
                     self.window.Get([self.rcvBuffer, MPI.DOUBLE], target_rank=wid)
-                    print(f'worker {self.me} received {self.rcvBuffer.size * self.rcvBuffer.itemsize} bytes from worker {wid} (task {tid})')
+                    logging.debug(f'worker {self.me} received {self.rcvBuffer.size * self.rcvBuffer.itemsize} bytes from worker {wid} (task {tid})')
         
+        # closing window operation
         self.window.Fence(MPI.MODE_NOSUCCEED)
+        # worker {self.me} is now guaranteed to have received the data
         self.comm.Barrier()
 
 
