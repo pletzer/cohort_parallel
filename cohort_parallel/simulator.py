@@ -4,7 +4,7 @@ from worker import Worker
 
 import sys
 import logging
-logging.basicConfig(format='%(asctime)s: %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s: %(message)s') #, level=logging.DEBUG)
 
 def main(*, nt: int):
     """
