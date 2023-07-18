@@ -29,7 +29,7 @@ class Worker:
         # attach the buffer to the MPI window
         self.window = MPI.Win.Create(self.srcBuffer, comm=comm)
         # allocate memory to receive the data from other workers
-        self.rcvBuffer = np.empty((ndata,), np.float64)
+        self.rcvBuffers = np.empty((na - 1, ndata,), np.float64)
 
 
     def get_num_time_steps_to_execute(self):
@@ -85,12 +85,14 @@ class Worker:
 
                 # fetch the data from the remote workers
                 other_task_ids = self.task.get_initial_dependencies(self.task_id)
-                for tid in other_task_ids:
-                    wid = self.task.get_worker(tid)
+                for idx, tid in enumerate(other_task_ids):
 
+                    wid = self.task.get_worker(tid)
+                    
                     # asynchrounous remote memory read
-                    self.window.Get([self.rcvBuffer, MPI.DOUBLE], target_rank=wid)
-                    logging.debug(f'worker {self.me} received {self.rcvBuffer.size * self.rcvBuffer.itemsize} bytes from worker {wid} (task {tid})')
+                    self.window.Get([self.rcvBuffers[idx, :], MPI.DOUBLE], target_rank=wid)
+
+                    logging.debug(f'worker {self.me} received {self.rcvBuffers.shape[1] * self.rcvBuffers.itemsize} bytes from worker {wid} (task {tid})')
         
         # the received data will be ready after this call
         self.window.Fence(MPI.MODE_NOSUCCEED)
