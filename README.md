@@ -25,7 +25,22 @@ Specify the number of workers NA (= number of age groups) and the number of time
 ```
 mpiexec -n NA python cohort_parallel/simulator.py --nt NT
 ```
-Each task will take 1 sec per time step. A task can have up to NA time steps. 
+By default, each task will take 0.015 sec per time step. A task can have up to NA time steps -- the worker takes other tasks to cover the number of time steps NT. 
+
+A full set of options is
+```
+python cohort_parallel/simulator.py -h
+usage: simulator.py [-h] --nt NT [-s STEP_TIME] [--ndata NDATA]
+
+Run a simulation
+
+options:
+  -h, --help            show this help message and exit
+  --nt NT               number of time steps
+  -s STEP_TIME, --step-time STEP_TIME
+                        (default: 0.015)
+  --ndata NDATA         (default: 10000)
+```
 
 ## Example
 
@@ -41,11 +56,11 @@ step        0    1    2    3
        5    7    6    5    8 
        6    7    6    9    8 
        7    7   10    9    8 
-Elapsed time: 8.04 secs
-Speedup: 3.98x (best case would be 4)
+Elapsed time: 0.15 secs
+Speedup: 3.10x (best case would be 4)
 ```
 The table displays the steps (rows) and the corresponding tasks executed by each worker (columns). For instance, worker 0 executes tasks 0 (step = 0...3) and task 7 (steps 4...7).
 
-Each step takes 1 second to execute. Since there are NT * NA steps, the total execution time 8 * 4 = 32 in this case. The wall clock time is 8.04 secs, corresponding to a speedup of 32/8.04 = 3.98 for 4 processes.
+Each step takes 0.015 seconds to execute. Since there are NT * NA steps, the total execution time 8 * 4 * 0.015 = 0.48 secs in this case. The wall clock time is 0.15 secs, corresponding to a speedup of 0.48/0.15 = 3.2 for 4 processes.
 
 

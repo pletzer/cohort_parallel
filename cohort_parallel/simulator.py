@@ -30,7 +30,7 @@ def print_info(list_of_executed_tasks, na, nt, comm, worker_id):
             print()
 
 
-def main(*, nt: int):
+def main(*, nt: int, step_time: float=0.015, ndata: int=10000):
     """
     Run a simulation
 
@@ -45,7 +45,7 @@ def main(*, nt: int):
     na = num_workers
 
     # create as many workers as there are age groups
-    worker = Worker(na, nt, worker_id)
+    worker = Worker(na, nt, worker_id, ndata=ndata)
 
     # gather info about which tasks have been executed
     list_of_executed_tasks = {}
@@ -61,7 +61,7 @@ def main(*, nt: int):
         list_of_executed_tasks[step] = list_of_executed_tasks.get(step, {})
 
         # execute the task for this time step
-        worker.execute_step()
+        worker.execute_step(step_time=step_time)
 
         list_of_executed_tasks[step][worker_id] = tid
 
@@ -72,8 +72,7 @@ def main(*, nt: int):
     if worker_id == 0:
         elapsed_time = toc - tic
         print(f'Elapsed time: {elapsed_time:.2f} secs')
-        # assumes 1 sec per step
-        print(f'Speedup: {na*nt/elapsed_time:.2f}x (best case would be {num_workers})')
+        print(f'Speedup: {na*nt*step_time/elapsed_time:.2f}x (best case would be {num_workers})')
 
 
 if __name__ == '__main__':

@@ -7,12 +7,14 @@ import logging
 
 class Worker:
 
-    def __init__(self, na, nt, worker_id, comm=MPI.COMM_WORLD):
+    def __init__(self, na, nt, worker_id, ndata=10000, comm=MPI.COMM_WORLD):
         """
         Constructor
         :param na: number of age groups
         :param nt: number of time steps
         :param worker_id: worker ID
+        :param ndata: number of doubles each worker needs to share
+        :param comm: MPI communicator
         """
         self.na = na
         self.nt = nt
@@ -24,7 +26,6 @@ class Worker:
 
         self.step = 0
 
-        ndata = 10
         self.srcBuffer = (-1) * np.ones((ndata,), np.float64)
         # attach the buffer to the MPI window
         self.window = MPI.Win.Create(self.srcBuffer, comm=comm)
@@ -48,7 +49,7 @@ class Worker:
         return self.step
 
 
-    def execute_step(self, exec_sec=1):
+    def execute_step(self, step_time):
         """
         Execute one step of a task (task = cohort)
         :param exec_sec: time it takes to execute one time step in secs
@@ -57,7 +58,7 @@ class Worker:
         logging.debug(f'worker {self.me} is executing task {self.task_id}...')
 
         # zzzzzzz.... simulates the code advancing by one time step
-        time.sleep(exec_sec)
+        time.sleep(step_time)
 
         logging.debug(f'worker {self.me} is done!')
 
