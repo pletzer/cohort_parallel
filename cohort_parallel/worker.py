@@ -70,7 +70,7 @@ class Worker:
         self.step += 1
 
         # at this point the data to get from the the cohorts are ready
-        # we're telling that the window operation is the first and will not involve RMA put
+        # we're telling that the window operation is the first and will not involve RMA puts
         self.window.Fence(MPI.MODE_NOPUT | MPI.MODE_NOPRECEDE)
 
         if self.step >= ns:
