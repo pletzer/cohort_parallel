@@ -56,12 +56,12 @@ class Worker:
 
         logging.debug(f'worker {self.me} is executing task {self.task_id}...')
 
-        # zzzzzzz....
+        # zzzzzzz.... simulates the code advancing by one time step
         time.sleep(exec_sec)
 
         logging.debug(f'worker {self.me} is done!')
 
-        # update the data
+        # update the data to share with other workers
         self.srcBuffer[:] += 1.0
 
         ns = self.task.get_num_time_steps(self.task_id)
@@ -69,6 +69,7 @@ class Worker:
         # update the time step
         self.step += 1
 
+        # at this point the data to get from the the cohorts are ready
         # we're telling that the window operation is the first and will not involve RMA put
         self.window.Fence(MPI.MODE_NOPUT | MPI.MODE_NOPRECEDE)
 
@@ -91,11 +92,8 @@ class Worker:
                     self.window.Get([self.rcvBuffer, MPI.DOUBLE], target_rank=wid)
                     logging.debug(f'worker {self.me} received {self.rcvBuffer.size * self.rcvBuffer.itemsize} bytes from worker {wid} (task {tid})')
         
-        # closing window operation
+        # the received data will be ready after this call
         self.window.Fence(MPI.MODE_NOSUCCEED)
-        # worker {self.me} is now guaranteed to have received the data
-        self.comm.Barrier()
-
 
 
     def get_task_to_execute(self):
