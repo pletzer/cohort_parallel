@@ -88,13 +88,13 @@ class Worker:
                 for idx, tid in enumerate(other_task_ids):
 
                     wid = self.task.get_worker(tid)
-                    
+
                     # asynchrounous remote memory read
                     self.window.Get([self.rcvBuffers[idx, :], MPI.DOUBLE], target_rank=wid)
 
                     logging.debug(f'worker {self.me} received {self.rcvBuffers.shape[1] * self.rcvBuffers.itemsize} bytes from worker {wid} (task {tid})')
         
-        # the received data will be ready after this call
+        # the self.recvBuffers data will be ready after this call
         self.window.Fence(MPI.MODE_NOSUCCEED)
 
 
