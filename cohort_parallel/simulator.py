@@ -37,8 +37,6 @@ def main(*, nt: int, step_time: float=0.015, ndata: int=10000):
     :param nt: number of time steps
     """
 
-    tic = MPI.Wtime()
-
     comm = MPI.COMM_WORLD
     worker_id = comm.Get_rank()
     num_workers = comm.Get_size()
@@ -49,6 +47,8 @@ def main(*, nt: int, step_time: float=0.015, ndata: int=10000):
 
     # gather info about which tasks have been executed
     list_of_executed_tasks = {}
+
+    tic = MPI.Wtime()
 
     #
     # iterate over the time steps
