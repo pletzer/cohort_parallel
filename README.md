@@ -42,7 +42,8 @@ options:
   --ndata NDATA         (default: 10000)
 ```
 
-## Example
+## Example: interactive run
+
 
 ```
 mpiexec -n 4 python cohort_parallel/simulator.py --nt 8
@@ -62,5 +63,7 @@ Speedup: 3.10x (best case would be 4)
 The table displays the steps (rows) and the corresponding tasks executed by each worker (columns). For instance, worker 0 executes tasks 0 (step = 0...3) and task 7 (steps 4...7).
 
 Each step takes 0.015 seconds to execute. Since there are NT * NA steps, the total execution time 8 * 4 * 0.015 = 0.48 secs in this case. The wall clock time is 0.15 secs, corresponding to a speedup of 0.48/0.15 = 3.2 for 4 processes.
+
+
 
 

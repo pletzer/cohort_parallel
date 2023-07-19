@@ -61,6 +61,7 @@ class TaskManager:
             res = {i for i in range(2*self.na - 1 - task_id)}.union({i for i in range(self.na, task_id)})
         return res
 
+
     def get_next_task(self, task_id):
         """
         Get the following task ID

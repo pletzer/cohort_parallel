@@ -98,6 +98,9 @@ class Worker:
         # the self.recvBuffers data will be ready after this call
         self.window.Fence(MPI.MODE_NOSUCCEED)
 
+        # apply some operations on the received data
+        #...
+
 
     def get_task_to_execute(self):
         """
