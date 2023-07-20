@@ -56,12 +56,12 @@ step        0    1    2    3
        5    7    6    5    8 
        6    7    6    9    8 
        7    7   10    9    8 
-Elapsed time: 0.15 secs
-Speedup: 3.10x (best case would be 4)
+Elapsed time: 0.123 secs
+Speedup: 3.908x (best case would be 4)
 ```
 The table displays the steps (rows) and the corresponding tasks executed by each worker (columns). For instance, worker 0 executes tasks 0 (step = 0...3) and task 7 (steps 4...7).
 
-Each step takes 0.015 seconds to execute. Since there are NT * NA steps, the total execution time 8 * 4 * 0.015 = 0.48 secs in this case. The wall clock time is 0.15 secs, corresponding to a speedup of 0.48/0.15 = 3.2 for 4 processes.
+Each step takes 0.015 seconds to execute. Since there are NT * NA steps, the total execution time 8 * 4 * 0.015 = 0.48 secs in this case. The wall clock time is 0.123 secs, which corresponds to a speedup of 0.48/0.12 = 3.9 for 4 processes.
 
 
 ## Example:  submit job to NeSI's mahuika platform
@@ -90,13 +90,13 @@ Typing
 ```
 tail cohort_parallel_JOBID.out
 ```
-(replacing JOBID with above job ID number) will returned somthing like
+(replacing JOBID with above job ID number) will returned something like
 ```
 Elapsed time: 1.67 secs
 Speedup: 33.18x (best case would be 37)
 ```
 
-You can adjust the number of workers (and other SLURM options) by passing "--ntasks NUM_WORKERS" to the "sbatch" command. The number of time steps and the number of data values to exchange between each pair of workers can be set b y passing the "-t NUM_STEPS" and "-d NDATA" options to the SLURM script. For instance,
+You can adjust the number of workers (and other SLURM options) by passing "--ntasks NUM_WORKERS" to the "sbatch" command. The number of time steps and the number of data values to exchange between each pair of workers can be set by passing the "-t NUM_STEPS" and "-d NDATA" options to the SLURM script. For instance,
 ```
 sbatch --ntasks=100 --nodes=2 slurm/simulator.sh -t 200 -d 10000
 ```
