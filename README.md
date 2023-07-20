@@ -98,7 +98,7 @@ Speedup: 33.18x (best case would be 37)
 
 You can adjust the number of workers (and other SLURM options) by passing "--ntasks NUM_WORKERS" to the "sbatch" command. The number of time steps and the number of data values to exchange between each pair of workers can be set b y passing the "-t NUM_STEPS" and "-d NDATA" options to the SLURM script. For instance,
 ```
-sbatch --ntasks=100 slurm/simulator.sh -t 200 -d 10000
+sbatch --ntasks=100 --nodes=2 slurm/simulator.sh -t 200 -d 10000
 ```
 
 
