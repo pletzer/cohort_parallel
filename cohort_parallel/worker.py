@@ -19,15 +19,20 @@ class Worker:
         self.na = na
         self.nt = nt
         self.task = TaskManager(na, nt)
-        # initially
+
+        self.worker_id = worker_id
+
+        # initially only
         self.task_id = worker_id
+
         self.comm = comm
-        self.me = comm.Get_rank()
+        self.proc_id = comm.Get_rank()
 
         self.step = 0
 
         self.srcBuffer = (-1) * np.ones((ndata,), np.float64)
         self.oldSrcBuffer = np.empty_like(self.srcBuffer)
+
         # allocate memory to receive the data from other workers
         self.rcvBuffer = np.empty((ndata,), np.float64)
         self.rcvWindow = MPI.Win.Create(self.rcvBuffer, comm=comm)
@@ -38,6 +43,14 @@ class Worker:
     	Destructor
     	"""
     	self.rcvWindow.Free()
+
+
+    def get_id(self):
+        """
+        Get this worker's ID
+        :returns number
+        """
+        return self.worker_id
 
 
     def get_num_time_steps_to_execute(self):
@@ -62,12 +75,12 @@ class Worker:
         :param exec_sec: time it takes to execute one time step in secs
         """
 
-        logging.debug(f'worker {self.me} is executing task {self.task_id}...')
+        logging.debug(f'worker {self.proc_id} is executing task {self.task_id}...')
 
         # zzzzzzz.... simulates the code advancing by one time step
         time.sleep(step_time)
 
-        logging.debug(f'worker {self.me} is done!')
+        logging.debug(f'worker {self.proc_id} is done!')
 
         # copy, we will need to remove this contribution from the summed data
         self.oldSrcBuffer[:] = self.srcBuffer
@@ -98,7 +111,7 @@ class Worker:
                 self.step = 0
 
                	# sum the data from the other workers (including itself)
-                self.rcvWindow.Accumulate(self.srcBuffer, target_rank=self.me, op=MPI.SUM)
+                self.rcvWindow.Accumulate(self.srcBuffer, target_rank=self.proc_id, op=MPI.SUM)
 
                 # remove the contribution from itself
                 self.rcvBuffer -= self.oldSrcBuffer
