@@ -7,7 +7,7 @@ import datetime
 import matplotlib.pylab as plt
 import seaborn as sn
 
-plt.xticks(rotation=45)
+#plt.xticks(rotation=45)
 
 case = 'cylc-cohort'
 
@@ -30,21 +30,23 @@ for fname in out_files:
     m = re.search(r'Speedup: (\d*\.\d+)x [^\d]*(\d+)', line)
     if m:
       speedup = float(m.group(1))
-      speedup_ideal = float(m.group(2))
+      speedup_ideal = int(m.group(2))
   elapsed_times.append(elapsed_time)
   speedups.append(speedup)
   speedup_ideals.append(speedup_ideal)
 
 df = pd.DataFrame({'elapsed_time': elapsed_times, 
                    'speedup': speedups,
-                   'speedup_ideal': speedup_ideals})
+                   'num_workers': speedup_ideals})
+df['parallel_eff'] = df['speedup'] / df['num_workers']
 df.to_csv(f'{case}.csv')
 
 print(df)
-sn.lineplot(data=df, x='speedup_ideal', y='speedup', errorbar='sd')
-plt.xlim([1, df.speedup_ideal.max()])
-plt.ylim([0, df.speedup_ideal.max()])
-plt.xlabel('na (= num workers)')
+sn.barplot(data=df, x='num_workers', y='parallel_eff')
+# sn.lineplot(data=df, x='speedup_ideal', y='speedup', errorbar='sd')
+# plt.xlim([1, df.speedup_ideal.max()])
+# plt.ylim([0, df.speedup_ideal.max()])
+plt.xlabel('num workers (= num age groups)')
 plt.title(f'cohort_parallel')
 plt.savefig(f'{case}.png', bbox_inches="tight")
 

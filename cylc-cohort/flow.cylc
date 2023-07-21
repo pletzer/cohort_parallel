@@ -1,10 +1,9 @@
 #!Jinja2
 [scheduler]
-#{% set NS = 37, 61, 85, 151 %}
-{% set NS = 37, 61 %}
+{% set NS = 37, 61, 85, 151 %}
 [task parameters]
     # run multiple instances
-    m = 0..2
+    m = 0..9
 [scheduling] # Define the tasks and when they should run
   [[graph]]
     R1 = """ # run this graph once
@@ -31,7 +30,14 @@
        --account = nesi99999 # CHANGE
        --time = 00:10:00
        --partition = milan
-       --ntasks= {{ N }}
+       --hint=nomultithread
+       --ntasks = {{ N }}
+       {% if N <= 128 %}
+       --nodes = 1
+       {% endif %}
+       {% if N > 128 %}
+       --nodes = 2
+       {% endif %}
   {% endfor %}
   [[analyse]]
     platform = localhost
