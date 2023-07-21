@@ -1,7 +1,7 @@
+from mpi4py import MPI
+
 import time
 from task_manager import TaskManager
-from mpi4py import MPI
-from mpi4py.util import dtlib
 import numpy as np
 import logging
 
@@ -32,6 +32,8 @@ class Worker:
 
         self.srcBuffer = (-1) * np.ones((ndata,), np.float64)
         self.oldSrcBuffer = np.empty_like(self.srcBuffer)
+
+        print(f'*** na={na} nt={nt} worker_id={worker_id} proc_id={self.proc_id}')
 
         # allocate memory to receive the data from other workers
         self.rcvBuffer = np.empty((ndata,), np.float64)

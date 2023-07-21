@@ -1,4 +1,5 @@
 from mpi4py import MPI
+
 import defopt
 from worker import Worker
 
@@ -61,6 +62,8 @@ def main(*, na: int, nt: int, step_time: float=0.015, ndata: int=10000):
     # the work ids associated with this process
     worker_ids = [wid for wid in range(num_workers) if wid % num_procs == proc_id]
 
+    logging.debug(f'process {proc_id} gets workers {worker_ids}')
+
     # create the workers for this processing element
     workers = [Worker(na=na, nt=nt, worker_id=wid, ndata=ndata) for wid in worker_ids]
 
@@ -69,18 +72,13 @@ def main(*, na: int, nt: int, step_time: float=0.015, ndata: int=10000):
 
     tic = MPI.Wtime()
 
-    #
-    # iterate over workers
-    #
-    for worker in workers:
 
-        worker_id = worker.get_id()
+    #
+    # iterate over the time steps
+    # 
+    for step in range(nt):
 
-        print(f'*** [{proc_id}] uses worker_id = {worker_id}')
-        #
-        # iterate over the time steps
-        # 
-        for step in range(nt):
+        for worker in workers:
 
             # get the task ID (= cohort ID)
             tid = worker.get_task_to_execute()
@@ -90,6 +88,8 @@ def main(*, na: int, nt: int, step_time: float=0.015, ndata: int=10000):
             # execute the task for this time step
             worker.execute_step(step_time=step_time)
 
+
+            worker_id = worker.get_id()
             list_of_executed_tasks[step][worker_id] = tid
 
     toc = MPI.Wtime()
