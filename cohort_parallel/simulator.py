@@ -71,8 +71,8 @@ def main(*, nt: int, step_time: float=0.015, ndata: int=10000):
 
     if worker_id == 0:
         elapsed_time = toc - tic
-        print(f'Elapsed time: {elapsed_time:.2f} secs')
-        print(f'Speedup: {na*nt*step_time/elapsed_time:.2f}x (best case would be {num_workers})')
+        print(f'Elapsed time: {elapsed_time:.3f} secs')
+        print(f'Speedup: {na*nt*step_time/elapsed_time:.3f}x (best case would be {num_workers})')
 
 
 if __name__ == '__main__':

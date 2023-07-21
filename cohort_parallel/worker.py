@@ -27,10 +27,17 @@ class Worker:
         self.step = 0
 
         self.srcBuffer = (-1) * np.ones((ndata,), np.float64)
-        # attach the buffer to the MPI window
-        self.window = MPI.Win.Create(self.srcBuffer, comm=comm)
+        self.oldSrcBuffer = np.empty_like(self.srcBuffer)
         # allocate memory to receive the data from other workers
-        self.rcvBuffers = np.empty((na - 1, ndata,), np.float64)
+        self.rcvBuffer = np.empty((ndata,), np.float64)
+        self.rcvWindow = MPI.Win.Create(self.rcvBuffer, comm=comm)
+
+
+    def __del__(self):
+    	"""
+    	Destructor
+    	"""
+    	self.rcvWindow.Free()
 
 
     def get_num_time_steps_to_execute(self):
@@ -62,6 +69,9 @@ class Worker:
 
         logging.debug(f'worker {self.me} is done!')
 
+        # copy, we will need to remove this contribution from the summed data
+        self.oldSrcBuffer[:] = self.srcBuffer
+
         # update the data to share with other workers
         self.srcBuffer[:] += 1.0
 
@@ -72,9 +82,12 @@ class Worker:
 
         # at this point the data to get from the the cohorts are ready
         # we're telling that the window operation is the first and will not involve RMA puts
-        self.window.Fence(MPI.MODE_NOPUT | MPI.MODE_NOPRECEDE)
+        self.rcvWindow.Fence(MPI.MODE_NOPUT | MPI.MODE_NOPRECEDE)
 
         if self.step >= ns:
+
+        	# the worker run through all the time steps for this cohort
+        	# we now need to get initial conditions from the other workers
 
             # reset
             self.task_id = self.task.get_next_task(self.task_id)
@@ -84,19 +97,14 @@ class Worker:
 
                 self.step = 0
 
-                # fetch the data from the remote workers
-                other_task_ids = self.task.get_initial_dependencies(self.task_id)
-                for idx, tid in enumerate(other_task_ids):
+               	# sum the data from the other workers (including itself)
+                self.rcvWindow.Accumulate(self.srcBuffer, target_rank=self.me, op=MPI.SUM)
 
-                    wid = self.task.get_worker(tid)
-
-                    # asynchrounous remote memory read
-                    self.window.Get([self.rcvBuffers[idx, :], MPI.DOUBLE], target_rank=wid)
-
-                    logging.debug(f'worker {self.me} received {self.rcvBuffers.shape[1] * self.rcvBuffers.itemsize} bytes from worker {wid} (task {tid})')
+                # remove the contribution from itself
+                self.rcvBuffer -= self.oldSrcBuffer
         
-        # the self.recvBuffers data will be ready after this call
-        self.window.Fence(MPI.MODE_NOSUCCEED)
+        # self.recvBuffer will be ready after this call
+        self.rcvWindow.Fence(MPI.MODE_NOSUCCEED)
 
         # apply some operations on the received data
         #...
