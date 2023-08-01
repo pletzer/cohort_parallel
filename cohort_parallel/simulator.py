@@ -66,15 +66,17 @@ def main(*, nt: int, na: int, step_time: float=0.015, ndata: int=10000):
     # generate the tasks
     tasks = [Task(tid, ndata) for tid in task_ids]
 
-    # number of time step for each cohort
+    # number of time steps for each cohort
     nts = [tsk_manager.get_num_steps(tid) for tid in task_ids]
+
+    logging.debug(f'[{worker_id}] => task_ids={task_ids} num time steps={nts}')
 
     tic = MPI.Wtime()
 
     # advance in time
     for step in range(nt):
 
-        list_of_executed_tasks[step] = {}
+        list_of_executed_tasks[step] = []
 
         # tell MPI to prepare receiving data
         rcvWin.Fence(MPI.MODE_NOPUT | MPI.MODE_NOPRECEDE)
@@ -83,20 +85,26 @@ def main(*, nt: int, na: int, step_time: float=0.015, ndata: int=10000):
         srcData[:] = 0
 
         # iterate over the tasks (cohorts) assigned to each worker
-        for i, tsk in enumerate(tasks):
+        for i in range(len(tasks)):
+
+            tid = task_ids[i]
 
             # run one step
-            tsk.execute_step(step_time)
+            tasks[i].execute_step(step_time)
 
             # sum the local contributions
-            srcData += tsk.get_data()
+            srcData += tasks[i].get_data()
+
+            list_of_executed_tasks[step].append(tasks[i].get_task_id())
 
             # create a new task, if need be
-            if tsk.get_local_step() == nts[i]:
-                next_tid = tsk_manager.get_next_task(task_ids[i])
+            if tasks[i].get_local_step() == nts[i]:
+                next_tid = tsk_manager.get_next_task(tid)
                 tasks[i] = Task(next_tid, ndata)
+                nts[i] = tsk_manager.get_num_steps(next_tid)
 
-            list_of_executed_tasks[step][worker_id] = tsk.get_task_id()
+                logging.debug(f'[{worker_id}] => current task id={tid} next task id={next_tid} will have {nts[i]} steps')
+
 
         # sum the contributions from all the workers
         rcvWin.Accumulate(srcData, target_rank=worker_id, op=MPI.SUM)
@@ -105,7 +113,9 @@ def main(*, nt: int, na: int, step_time: float=0.015, ndata: int=10000):
 
     toc = MPI.Wtime()
 
-    print_info(list_of_executed_tasks, na, nt, comm, worker_id)
+    logging.debug(f'[{worker_id}] => list_of_executed_tasks={list_of_executed_tasks} (step -> [task_ids])')
+
+    #print_info(list_of_executed_tasks, na, nt, comm, worker_id)
 
     if worker_id == 0:
         elapsed_time = toc - tic
