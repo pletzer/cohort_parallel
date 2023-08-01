@@ -1,10 +1,12 @@
+import numpy as np
 from mpi4py import MPI
 import defopt
-from worker import Worker
 
-import sys
+from task_manager import TaskManager
+from task import Task
+
 import logging
-logging.basicConfig(format='%(asctime)s: %(message)s') #, level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s: %(message)s', level=logging.DEBUG)
 
 
 def print_info(list_of_executed_tasks, na, nt, comm, worker_id):
@@ -30,40 +32,76 @@ def print_info(list_of_executed_tasks, na, nt, comm, worker_id):
             print()
 
 
-def main(*, nt: int, step_time: float=0.015, ndata: int=10000):
+def main(*, nt: int, na: int, step_time: float=0.015, ndata: int=10000):
     """
     Run a simulation
 
     :param nt: number of time steps
+    :param na: number of age groups
+    :param step_time: time it takes to execute one time step for one cohort in seconds
+    :param ndata: number of doubles to accumulate at the end of each time step
     """
 
+    # info about which tasks have been executed
+    list_of_executed_tasks = {}
+
     comm = MPI.COMM_WORLD
+    # worker ID = MPI rank
     worker_id = comm.Get_rank()
     num_workers = comm.Get_size()
-    na = num_workers
 
-    # create as many workers as there are age groups
-    worker = Worker(na, nt, worker_id, ndata=ndata)
+    # data to send to other workers
+    srcData = np.zeros((ndata,), np.float64)
 
-    # gather info about which tasks have been executed
-    list_of_executed_tasks = {}
+    # data to receive from other workers
+    rcvData = np.empty((ndata,), np.float64)
+    rcvWin = MPI.Win.Create(rcvData, comm=comm)
+
+    # assign tasks to workers
+    tsk_manager = TaskManager(na, nt, num_workers)
+    
+    # get the initial tasks for this processing unit (worker)
+    task_ids = tsk_manager.get_init_task_ids(worker_id)
+    
+    # generate the tasks
+    tasks = [Task(tid, ndata) for tid in task_ids]
+
+    # number of time step for each cohort
+    nts = [tsk_manager.get_num_steps(tid) for tid in task_ids]
 
     tic = MPI.Wtime()
 
-    #
-    # iterate over the time steps
-    # 
+    # advance in time
     for step in range(nt):
 
-        # get the task ID (= cohort ID)
-        tid = worker.get_task_to_execute()
+        list_of_executed_tasks[step] = {}
 
-        list_of_executed_tasks[step] = list_of_executed_tasks.get(step, {})
+        # tell MPI to prepare receiving data
+        rcvWin.Fence(MPI.MODE_NOPUT | MPI.MODE_NOPRECEDE)
 
-        # execute the task for this time step
-        worker.execute_step(step_time=step_time)
+        # set the data to zero
+        srcData[:] = 0
 
-        list_of_executed_tasks[step][worker_id] = tid
+        # iterate over the tasks (cohorts) assigned to each worker
+        for i, tsk in enumerate(tasks):
+
+            # run one step
+            tsk.execute_step(step_time)
+
+            # sum the local contributions
+            srcData += tsk.get_data()
+
+            # create a new task, if need be
+            if tsk.get_local_step() == nts[i]:
+                next_tid = tsk_manager.get_next_task(task_ids[i])
+                tasks[i] = Task(next_tid, ndata)
+
+            list_of_executed_tasks[step][worker_id] = tsk.get_task_id()
+
+        # sum the contributions from all the workers
+        rcvWin.Accumulate(srcData, target_rank=worker_id, op=MPI.SUM)
+
+        rcvWin.Fence(MPI.MODE_NOSUCCEED)
 
     toc = MPI.Wtime()
 

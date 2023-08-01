@@ -1,8 +1,9 @@
+import logging
 
 
 class TaskManager:
 
-    def __init__(self, na, nt):
+    def __init__(self, na, nt, num_workers):
         """
         Constructor
         :param na: number of age groups
@@ -10,17 +11,27 @@ class TaskManager:
         """
         self.na = na
         self.nt = nt
+        self.num_cohorts = na + nt - 1
+
+        # initially
+        self.worker2task = {wid: [] for wid in range(num_workers)}
+        for i in range(na):
+            worker_id = i % num_workers
+            self.worker2task[worker_id].append(i)
+
+        logging.debug(f'worker to task_id map: {self.worker2task}')
 
 
-    def get_num_tasks(self):
+
+    def get_init_task_ids(self, worker_id):
         """
-        Get the number of tasks (or cohorts)
-        :returns number
+        Get the initial task Ids for this worker
+        :param worker_id: worker ID (range 0 to num procs - 1)
         """
-        return self.nt + self.na - 1
+        return self.worker2task[worker_id]
 
  
-    def get_num_time_steps(self, task_id):
+    def get_num_steps(self, task_id):
         """
         Get the number of time steps of the current task
         :param task_id: task ID
@@ -35,33 +46,6 @@ class TaskManager:
         return res
 
 
-    def get_worker(self, task_id):
-        """
-        Get the worker ID for this task
-        :param task_id: task ID
-        :returns number        
-        """
-        if task_id < self.na:
-            return task_id
-        else:
-            return (self.na - 1 - task_id) % self.na
-
-
-
-    def get_initial_dependencies(self, task_id):
-        """
-        Get all the task dependencies for the current task
-        :param task_id: task ID
-        :returns number
-        """
-        res = None
-        if task_id > 2*self.na - 1:
-            res = {i for i in range(task_id - self.na + 1, task_id)}
-        elif self.na <= task_id <= 2*self.na - 1:
-            res = {i for i in range(2*self.na - 1 - task_id)}.union({i for i in range(self.na, task_id)})
-        return res
-
-
     def get_next_task(self, task_id):
         """
         Get the following task ID
@@ -71,11 +55,10 @@ class TaskManager:
         res = task_id + self.na
         if task_id < self.na:
             res = task_id + 2*(self.na - 1 - task_id) + 1
-        elif task_id > self.get_num_tasks() - self.na - 1:
+        elif task_id > self.nt - 1:
             # last task
             res = None
         return res
-
 
 
 
