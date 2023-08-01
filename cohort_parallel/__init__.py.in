@@ -10,7 +10,7 @@ A toy problem demonstrating parallelisation over cohorts.
 
 __version__ = "@VERSION@"
 
-__all__ = ('task_manager', 'worker')
+__all__ = ('task_manager', 'task')
 
 from .task_manager import TaskManager
-from .worker import Worker
+from .task import Task

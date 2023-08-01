@@ -7,14 +7,12 @@ def test_task2_3():
     2 0
     3 2
     """
-    t = TaskManager(2, 3)
+    t = TaskManager(na=2, nt=3, num_workers=1)
 
-    assert(t.get_num_tasks() == 4)
-
-    assert(t.get_num_time_steps(0) == 2)
-    assert(t.get_num_time_steps(1) == 1)
-    assert(t.get_num_time_steps(2) == 2)
-    assert(t.get_num_time_steps(3) == 1)
+    assert(t.get_num_steps(0) == 2)
+    assert(t.get_num_steps(1) == 1)
+    assert(t.get_num_steps(2) == 2)
+    assert(t.get_num_steps(3) == 1)
 
     assert(t.get_initial_dependencies(0) is None)
     assert(t.get_initial_dependencies(1) is None)
@@ -25,11 +23,6 @@ def test_task2_3():
     assert(t.get_next_task(1) == 2)
     assert(t.get_next_task(2) == None)
     assert(t.get_next_task(3) == None)
-
-    assert(t.get_worker(0) == 0)
-    assert(t.get_worker(1) == 1)
-    assert(t.get_worker(2) == 1)
-    assert(t.get_worker(3) == 0)
 
 
 def test_task3_10():
@@ -45,22 +38,20 @@ def test_task3_10():
     10  9  8
     11 10  9
     """
-    t = TaskManager(3, 10)
+    t = TaskManager(na=3, nt=10)
 
-    assert(t.get_num_tasks() == 12)
-
-    assert(t.get_num_time_steps(0) == 3)
-    assert(t.get_num_time_steps(1) == 2)
-    assert(t.get_num_time_steps(2) == 1)
-    assert(t.get_num_time_steps(3) == 3)
-    assert(t.get_num_time_steps(4) == 3)
-    assert(t.get_num_time_steps(5) == 3)
-    assert(t.get_num_time_steps(6) == 3)
-    assert(t.get_num_time_steps(7) == 3)
-    assert(t.get_num_time_steps(8) == 3)
-    assert(t.get_num_time_steps(9) == 3)
-    assert(t.get_num_time_steps(10) == 2)
-    assert(t.get_num_time_steps(11) == 1)
+    assert(t.get_num_steps(0) == 3)
+    assert(t.get_num_steps(1) == 2)
+    assert(t.get_num_steps(2) == 1)
+    assert(t.get_num_steps(3) == 3)
+    assert(t.get_num_steps(4) == 3)
+    assert(t.get_num_steps(5) == 3)
+    assert(t.get_num_steps(6) == 3)
+    assert(t.get_num_steps(7) == 3)
+    assert(t.get_num_steps(8) == 3)
+    assert(t.get_num_steps(9) == 3)
+    assert(t.get_num_steps(10) == 2)
+    assert(t.get_num_steps(11) == 1)
 
     assert(t.get_initial_dependencies(0) is None)
     assert(t.get_initial_dependencies(1) is None)
@@ -88,20 +79,6 @@ def test_task3_10():
     assert(t.get_next_task(10) == None)
     assert(t.get_next_task(11) == None)
 
-    assert(t.get_worker(0) == 0)
-    assert(t.get_worker(1) == 1)
-    assert(t.get_worker(2) == 2)
-    assert(t.get_worker(3) == 2)
-    assert(t.get_worker(4) == 1)
-    assert(t.get_worker(5) == 0)
-    assert(t.get_worker(6) == 2)
-    assert(t.get_worker(7) == 1)
-    assert(t.get_worker(8) == 0)
-    assert(t.get_worker(9) == 2)
-    assert(t.get_worker(10) == 1)
-    assert(t.get_worker(11) == 0)
-
-
 
 def test_task4_8():
     """
@@ -116,19 +93,17 @@ def test_task4_8():
     """
     t = TaskManager(4, 8)
 
-    assert(t.get_num_tasks() == 11)
-
-    assert(t.get_num_time_steps(0) == 4)
-    assert(t.get_num_time_steps(1) == 3)
-    assert(t.get_num_time_steps(2) == 2)
-    assert(t.get_num_time_steps(3) == 1)
-    assert(t.get_num_time_steps(4) == 4)
-    assert(t.get_num_time_steps(5) == 4)
-    assert(t.get_num_time_steps(6) == 4)
-    assert(t.get_num_time_steps(7) == 4)
-    assert(t.get_num_time_steps(8) == 3)
-    assert(t.get_num_time_steps(9) == 2)
-    assert(t.get_num_time_steps(10) == 1)
+    assert(t.get_num_steps(0) == 4)
+    assert(t.get_num_steps(1) == 3)
+    assert(t.get_num_steps(2) == 2)
+    assert(t.get_num_steps(3) == 1)
+    assert(t.get_num_steps(4) == 4)
+    assert(t.get_num_steps(5) == 4)
+    assert(t.get_num_steps(6) == 4)
+    assert(t.get_num_steps(7) == 4)
+    assert(t.get_num_steps(8) == 3)
+    assert(t.get_num_steps(9) == 2)
+    assert(t.get_num_steps(10) == 1)
 
     assert(t.get_initial_dependencies(0) is None)
     assert(t.get_initial_dependencies(1) is None)
@@ -154,19 +129,7 @@ def test_task4_8():
     assert(t.get_next_task(9) == None)
     assert(t.get_next_task(10) == None)
 
-    assert(t.get_worker(0) == 0)
-    assert(t.get_worker(1) == 1)
-    assert(t.get_worker(2) == 2)
-    assert(t.get_worker(3) == 3)
-    assert(t.get_worker(4) == 3)
-    assert(t.get_worker(5) == 2)
-    assert(t.get_worker(6) == 1)
-    assert(t.get_worker(7) == 0)
-    assert(t.get_worker(8) == 3)
-    assert(t.get_worker(9) == 2)
-    assert(t.get_worker(10) == 1)
-
-    
+   
 
 if __name__ == '__main__':
     test_task2_3()

@@ -23,8 +23,8 @@
     script = """
       module load Python
       NT=$(expr 2 \* {{ N }})
-      echo "executing: srun python $TOP_DIR/cohort_parallel/simulator.py --nt $NT --ndata $NDATA"
-      srun python $TOP_DIR/cohort_parallel/simulator.py --nt $NT --ndata $NDATA
+      echo "executing: srun python $TOP_DIR/cohort_parallel/simulator.py --nt $NT --na {{ N }} --ndata $NDATA"
+      srun python $TOP_DIR/cohort_parallel/simulator.py --nt $NT --na {{ N }} --ndata $NDATA
     """
     [[[directives]]] # Default SLURM options for the tasks below
        --account = nesi99999 # CHANGE

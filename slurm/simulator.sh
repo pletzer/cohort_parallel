@@ -21,4 +21,4 @@ done
 
 echo "Number of workers: ${SLURM_NTASKS}"
 echo "Running the simulator for $nt steps and exchanging $ndata doubles"
-srun python cohort_parallel/simulator.py --nt $nt --ndata $ndata
+srun python cohort_parallel/simulator.py --nt $nt --na ${SLURM_NTASKS} --ndata $ndata
