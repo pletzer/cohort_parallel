@@ -6,7 +6,7 @@ from task_manager import TaskManager
 from task import Task
 
 import logging
-logging.basicConfig(format='%(asctime)s: %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s: %(message)s') #, level=logging.DEBUG)
 
 
 def print_info(list_of_executed_tasks, na, nt, comm, worker_id):
@@ -15,10 +15,11 @@ def print_info(list_of_executed_tasks, na, nt, comm, worker_id):
     lets = comm.gather(list_of_executed_tasks, root=0)
 
     if worker_id == 0:
+        logging.debug(f'map step => task ID for each worker: {lets}')
 
         for wid in range(len(lets)):
-            print(f'Worker {wid}')
-            print(f'==============')
+            print(f'Worker {wid:4d}')
+            print(f'===========')
             for step in range(nt):
                 print(f'{step:6d} | ', end='')
                 for tid in lets[wid][step]:
@@ -79,8 +80,6 @@ def main(*, nt: int, na: int, step_time: float=0.015, ndata: int=10000):
         # iterate over the tasks (cohorts) assigned to each worker
         for i in range(len(tasks)):
 
-            tid = task_ids[i]
-
             # run one step
             tasks[i].execute_step(step_time)
 
@@ -90,10 +89,13 @@ def main(*, nt: int, na: int, step_time: float=0.015, ndata: int=10000):
             list_of_executed_tasks[step].append(tasks[i].get_task_id())
 
             # create a new task, if need be
-            if tasks[i].get_local_step() == nts[i]:
-                next_tid = tsk_manager.get_next_task(tid)
+            if tasks[i].get_local_step() == nts[i] and step < nt - 1:
+                next_tid = tsk_manager.get_next_task(task_ids[i])
+                old_tid = task_ids[i]
+                task_ids[i] = next_tid
                 tasks[i] = Task(next_tid, ndata)
                 nts[i] = tsk_manager.get_num_steps(next_tid)
+                logging.debug(f'after time step {step} worker {worker_id} will switch from {old_tid} to cohort {next_tid}, which has {nts[i]} steps')
 
         # sum the contributions from all the workers
         rcvWin.Accumulate(srcData, target_rank=worker_id, op=MPI.SUM)
