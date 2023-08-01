@@ -1,0 +1,49 @@
+#!Jinja2
+[scheduler]
+{% set NS = 37, 61, 85, 151 %}
+[task parameters]
+    # run multiple instances
+    m = 0..9
+[scheduling] # Define the tasks and when they should run
+  [[graph]]
+    R1 = """ # run this graph once
+    {% for N in NS %} 
+      run{{ N }}<m> => analyse
+    {% endfor %}
+    """
+[runtime] # Define what each task should run
+  [[root]]
+    [[[environment]]]
+      NDATA="24000"
+      TOP_DIR="/home/pletzera/cohort_parallel/" # CHANGE
+  {% for N in NS %}
+  [[run{{ N }}<m>]]
+    platform = mahuika-slurm # Run "cylc conf" to see platforms. 
+    execution retry delays = 1*PT10S # retry
+    script = """
+      module load Python
+      NT=$(expr 2 \* {{ N }})
+      echo "executing: srun python $TOP_DIR/cohort_parallel/simulator.py --nt $NT --na {{ N }} --ndata $NDATA"
+      srun python $TOP_DIR/cohort_parallel/simulator.py --nt $NT --na {{ N }} --ndata $NDATA
+    """
+    [[[directives]]] # Default SLURM options for the tasks below
+       --account = nesi99999 # CHANGE
+       --time = 00:10:00
+       --partition = milan
+       --hint=nomultithread
+       --ntasks = {{ N }}
+       {% if N <= 128 %}
+       --nodes = 1
+       {% endif %}
+       {% if N > 128 %}
+       --nodes = 2
+       {% endif %}
+  {% endfor %}
+  [[analyse]]
+    platform = localhost
+    script = """
+    module purge
+    module load Python
+    python $TOP_DIR/cylc-cohort/analyse.py
+    """
+
