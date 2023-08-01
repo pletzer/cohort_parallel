@@ -45,7 +45,7 @@ class Task:
         :param exec_sec: time it takes to execute one time step in secs
         """
 
-        logging.debug(f'executing task {self.task_id}...')
+        logging.debug(f'executing task {self.task_id} at local time step {self.local_step}...')
 
         # zzzzzzz.... simulates the code advancing by one time step
         time.sleep(step_time)

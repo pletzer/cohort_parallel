@@ -19,9 +19,6 @@ class TaskManager:
             worker_id = i % num_workers
             self.worker2task[worker_id].append(i)
 
-        logging.debug(f'worker to task_id map: {self.worker2task}')
-
-
 
     def get_init_task_ids(self, worker_id):
         """
