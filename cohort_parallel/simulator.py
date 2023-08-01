@@ -15,21 +15,17 @@ def print_info(list_of_executed_tasks, na, nt, comm, worker_id):
     lets = comm.gather(list_of_executed_tasks, root=0)
 
     if worker_id == 0:
-        # flatten the list of dicts into a single multilevel dict
-        all_lets = {}
-        for i in range(na):
-            for step, item in lets[i].items():
-                all_lets[step] = all_lets.get(step, {}) | item
 
-        print('step     ', end='')
-        for wid in range(na):
-            print(f'{wid:4d} ', end='')
-        print('\n' + '-'*(9 + (4 + 1)*na))
-        for step in range(nt):
-            print(f'{step:8d} ', end='')
-            for wid in range(na):
-                print(f'{all_lets[step][wid]:4d} ', end='')
-            print()
+        logging.debug(f'[{worker_id}] lets={lets}')
+
+        for wid in range(len(lets)):
+            print(f'Worker {wid}')
+            print(f'==============')
+            for step in range(nt):
+                print(f'{step:6d} | ', end='')
+                for tid in lets[wid][step]:
+                    print(f'{tid:4d} ', end='')
+                print()
 
 
 def main(*, nt: int, na: int, step_time: float=0.015, ndata: int=10000):
@@ -115,7 +111,7 @@ def main(*, nt: int, na: int, step_time: float=0.015, ndata: int=10000):
 
     logging.debug(f'[{worker_id}] => list_of_executed_tasks={list_of_executed_tasks} (step -> [task_ids])')
 
-    #print_info(list_of_executed_tasks, na, nt, comm, worker_id)
+    print_info(list_of_executed_tasks, na, nt, comm, worker_id)
 
     if worker_id == 0:
         elapsed_time = toc - tic
