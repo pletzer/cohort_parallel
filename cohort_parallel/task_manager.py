@@ -3,7 +3,7 @@ import logging
 
 class TaskManager:
 
-    def __init__(self, na, nt, num_workers):
+    def __init__(self, na, nt, num_workers=1):
         """
         Constructor
         :param na: number of age groups
@@ -22,7 +22,7 @@ class TaskManager:
 
     def get_init_task_ids(self, worker_id):
         """
-        Get the initial task Ids for this worker
+        Get the initial task Ids for this worker, when the simulation starts
         :param worker_id: worker ID (range 0 to num procs - 1)
         """
         return self.worker2task[worker_id]
@@ -43,6 +43,20 @@ class TaskManager:
         return res
 
 
+    def get_initial_dependencies(self, task_id):
+        """
+        Get all the task dependencies for the current task
+        :param task_id: task ID
+        :returns number
+        """
+        res = None
+        if task_id > 2*self.na - 1:
+            res = {i for i in range(task_id - self.na + 1, task_id)}
+        elif self.na <= task_id <= 2*self.na - 1:
+            res = {i for i in range(2*self.na - 1 - task_id)}.union({i for i in range(self.na, task_id)})
+        return res
+
+
     def get_next_task(self, task_id):
         """
         Get the following task ID
@@ -52,7 +66,7 @@ class TaskManager:
         res = task_id + self.na
         if task_id < self.na:
             res = task_id + 2*(self.na - 1 - task_id) + 1
-        elif task_id > self.nt - 1:
+        elif task_id >= self.nt - 1:
             # last task
             res = None
         return res
