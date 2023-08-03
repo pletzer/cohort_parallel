@@ -42,12 +42,23 @@ df['parallel_eff'] = df['speedup'] / df['num_workers']
 df.to_csv(f'{case}.csv')
 
 print(df)
-sn.barplot(data=df, x='num_workers', y='parallel_eff')
-# sn.lineplot(data=df, x='speedup_ideal', y='speedup', errorbar='sd')
-# plt.xlim([1, df.speedup_ideal.max()])
-# plt.ylim([0, df.speedup_ideal.max()])
-plt.xlabel('num workers (= num age groups)')
-plt.title(f'cohort_parallel')
+
+x = df.num_workers.unique()
+x.sort()
+print(x)
+print(df[df.num_workers == 10])
+print(df[df.num_workers == 10].speedup)
+print(df[df.num_workers == 10].speedup.mean())
+y = [df[df.num_workers == n].speedup.mean() for n in x]
+print(y)
+e = [df[df.num_workers == n].speedup.std() for n in x]
+
+plt.errorbar(x, y, yerr=e, marker='o', mfc='r', mec='k') 
+plt.plot(x, x, 'k--')
+
+plt.ylabel('speedup')
+plt.xlabel('num workers')
+plt.title(f'na= 151 nt = 302')
 plt.savefig(f'{case}.png', bbox_inches="tight")
 
 

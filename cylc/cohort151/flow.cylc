@@ -1,10 +1,10 @@
 #!Jinja2
 [scheduler]
 {% set NA = 151 %}
-{% set NWORKERS = 2, 10, 16, 32, 76 %}
+{% set NWORKERS = 2, 10, 16, 32, 76, 151 %}
 [task parameters]
     # run multiple instances
-    m = 0..1
+    m = 0..9
 [scheduling] # Define the tasks and when they should run
   [[graph]]
     R1 = """ # run this graph once
