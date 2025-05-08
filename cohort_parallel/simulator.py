@@ -18,8 +18,8 @@ def print_info(list_of_executed_tasks, na, nt, comm, worker_id):
         logging.debug(f'map step => task ID for each worker: {lets}')
 
         for wid in range(len(lets)):
-            print(f'Worker {wid:4d}')
-            print(f'===========')
+            print(f'Worker {wid:4d} step => task ID')
+            print(f'====================================')
             for step in range(nt):
                 print(f'{step:6d} | ', end='')
                 for tid in lets[wid][step]:
