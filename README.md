@@ -9,11 +9,14 @@ You need:
  * mpi4py
  * defopt
 
-Type 
+We recommend that you install the Python dependecies in a virtual environmen
 ```
-pip install mpi4py defopt
+python -mvenv venv
+source venv/bin/activate
+pip install numpy mpi4py defopt
 ```
-to install the packages. Then type
+
+Then type
 ```
 pip install -e .
 ```
