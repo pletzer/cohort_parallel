@@ -9,6 +9,7 @@ class Task:
         """
         Constructor
         :param task_id: task ID in the range 0... na - 1
+        :param ndata: number of doubles to accumulate at the end of each time step
         """
         self.task_id = task_id
         self.local_step = 0
